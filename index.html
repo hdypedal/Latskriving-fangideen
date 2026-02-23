@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fang ideen! – Låtskriving</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --paper: #141414;
+    --gold: #5ca361;
+    --gold-dim: #3d7242;
+    --cream: #f0e6cc;
+    --muted: #999;
+    --red: #c0392b;
+    --green: #5ca361;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(92,163,97,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(92,163,97,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 700px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 400;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    line-height: 1.7;
+  }
+
+  /* Category selector */
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 14px;
+  }
+
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+
+  .cat-btn {
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    text-transform: uppercase;
+  }
+
+  .cat-btn:hover {
+    border-color: var(--gold-dim);
+    color: var(--cream);
+  }
+
+  .cat-btn.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #000;
+  }
+
+  /* Timer control */
+  .timer-control {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+  }
+
+  .timer-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .timer-options {
+    display: flex;
+    gap: 8px;
+  }
+
+  .time-btn {
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .time-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Draw button */
+  .draw-btn {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.02em;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .draw-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: 0;
+  }
+
+  .draw-btn:hover::before { transform: scaleX(1); }
+  .draw-btn:hover { color: #000; }
+  .draw-btn span { position: relative; z-index: 1; }
+
+  .draw-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .draw-btn:disabled::before { display: none; }
+
+  /* Word display */
+  .word-stage {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 32px;
+    position: relative;
+  }
+
+  .word-category-tag {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 16px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: all 0.4s 0.1s;
+  }
+
+  .big-word {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 12vw, 6rem);
+    font-weight: 700;
+    color: var(--cream);
+    line-height: 1;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing: -0.02em;
+  }
+
+  .word-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 16px;
+    opacity: 0;
+    transition: opacity 0.4s 0.3s;
+    line-height: 1.7;
+    max-width: 400px;
+  }
+
+  .word-stage.revealed .word-category-tag,
+  .word-stage.revealed .big-word,
+  .word-stage.revealed .word-hint {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Timer display */
+  .timer-stage {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .timer-stage.visible { display: flex; }
+
+  .timer-ring {
+    position: relative;
+    width: 120px;
+    height: 120px;
+  }
+
+  .timer-svg {
+    transform: rotate(-90deg);
+    width: 120px;
+    height: 120px;
+  }
+
+  .timer-track {
+    fill: none;
+    stroke: #222;
+    stroke-width: 3;
+  }
+
+  .timer-progress {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 339.3;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.5s;
+  }
+
+  .timer-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .timer-digits {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.6rem;
+    color: var(--cream);
+    letter-spacing: 0.05em;
+  }
+
+  .timer-status {
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .timer-controls {
+    display: flex;
+    gap: 10px;
+  }
+
+  .tc-btn {
+    background: transparent;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tc-btn:hover { border-color: var(--cream); color: var(--cream); }
+  .tc-btn.stop { border-color: var(--red); color: var(--red); }
+  .tc-btn.stop:hover { background: var(--red); color: #fff; }
+
+  /* Done state */
+  .done-message {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    border: 1px solid var(--gold-dim);
+    margin-bottom: 32px;
+  }
+
+  .done-message.visible { display: block; }
+
+  .done-message h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-style: italic;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .done-message p {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid #222;
+    margin: 8px 0 36px;
+  }
+
+  /* Placeholder state */
+  .placeholder-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-style: italic;
+    color: #333;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <p class="eyebrow">NLA Høgskolen · Låtskriving</p>
+    <h1>Fang <em>idéen!</em></h1>
+    <p class="subtitle">En skriveøvelse for skrivesperre.<br>Velg en kategori, trekk et ord, og skriv i vei.<br>Ikke tenk – bare skriv.</p>
+  </header>
+
+  <!-- Categories -->
+  <p class="section-label">01 — Velg kategori</p>
+  <div class="categories">
+    <button class="cat-btn" onclick="selectCategory(this, 'følelser')">Følelser</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'steder')">Steder</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'relasjoner')">Personer & relasjoner</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'sanser')">Sanseinntrykk</button>
+    <button class="cat-btn" onclick="selectCategory(this, 'samfunn')">Samfunnsspørsmål</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Timer -->
+  <p class="section-label">02 — Velg tid</p>
+  <div class="timer-control">
+    <span class="timer-label">Minutter:</span>
+    <div class="timer-options">
+      <button class="time-btn" onclick="selectTime(this, 3)">3</button>
+      <button class="time-btn active" onclick="selectTime(this, 6)">6</button>
+      <button class="time-btn" onclick="selectTime(this, 10)">10</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Draw button -->
+  <button class="draw-btn" id="drawBtn" onclick="drawWord()" disabled>
+    <span>↯ Trekk et ord</span>
+  </button>
+
+  <!-- Word display -->
+  <div class="word-stage" id="wordStage">
+    <p class="placeholder-text">Velg en kategori ovenfor</p>
+    <p class="word-category-tag" id="wordCatTag"></p>
+    <p class="big-word" id="bigWord"></p>
+    <p class="word-hint" id="wordHint"></p>
+  </div>
+
+  <!-- Timer display -->
+  <div class="timer-stage" id="timerStage">
+    <div class="timer-ring">
+      <svg class="timer-svg" viewBox="0 0 120 120">
+        <circle class="timer-track" cx="60" cy="60" r="54"/>
+        <circle class="timer-progress" id="timerProgress" cx="60" cy="60" r="54"/>
+      </svg>
+      <div class="timer-text">
+        <span class="timer-digits" id="timerDigits">6:00</span>
+        <span class="timer-status" id="timerStatus">KLAR</span>
+      </div>
+    </div>
+    <div class="timer-controls">
+      <button class="tc-btn" id="pauseBtn" onclick="togglePause()">Pause</button>
+      <button class="tc-btn stop" onclick="stopTimer()">Avslutt</button>
+    </div>
+  </div>
+
+  <!-- Done message -->
+  <div class="done-message" id="doneMessage">
+    <h3>Tid er ute.</h3>
+    <p>Les igjennom det du har skrevet.<br>Fargelegg vers-mat og refreng-mat. Ta vare på alt – selv det du ikke liker.</p>
+  </div>
+
+</div>
+
+<script>
+const words = {
+  følelser: [
+    { word: "Savn", hint: "Hvem eller hva savner du? Beskriv kroppen din når savnet treffer." },
+    { word: "Skam", hint: "Et øyeblikk du vil gjerne ha glemt. Hva skjedde rett etterpå?" },
+    { word: "Lettelse", hint: "Hva var det tyngste du slapp tak i? Beskriv pusten." },
+    { word: "Sjalusi", hint: "Hvem er du sjalu på, og hva tror du de har som du mangler?" },
+    { word: "Takknemlighet", hint: "Det lille, hverdagslige du tar for gitt. Se nærmere på det." },
+    { word: "Sinne", hint: "Hva gjør kroppen din når du er rasende? Hvor sitter det?" },
+    { word: "Lengsel", hint: "Et sted, et menneske, en tid. Hva lukter det der?" },
+    { word: "Ensomhet", hint: "Du kan være ensom midt blant folk. Beskriv det rommet." },
+    { word: "Håp", hint: "Det du ikke tør si høyt ennå. Skriv det ned likevel." },
+    { word: "Bitterhet", hint: "Noe som ble lovt, men aldri holdt. Hva er konsekvensen i dag?" },
+    { word: "Stolthet", hint: "En prestasjon ingen andre visste om. Hvordan feiret du det?" },
+    { word: "Frykt", hint: "Hva er du egentlig redd for? Ikke det åpenbare – gå dypere." },
+    { word: "Ro", hint: "Et øyeblikk av total stillhet. Hva forsvant for en stund?" },
+    { word: "Sorg", hint: "Hva gjør du med hendene dine når du er lei deg?" },
+    { word: "Kjærlighet", hint: "Ikke det store – et lite tegn på kjærlighet du nesten ikke la merke til." },
+  ],
+  steder: [
+    { word: "Togstasjonen", hint: "Hvem er der? Hvem venter, og hvem forlater?" },
+    { word: "Kjøkkenet", hint: "Kl. 03.00. Hvem er du alene med tankene dine?" },
+    { word: "Skogen", hint: "Hva hører du når du slutter å gå? Hva er det som nærmer seg?" },
+    { word: "Sykehusgangen", hint: "Luktene, lysene. Beskriv ventetiden." },
+    { word: "Parkeringsplassen", hint: "Et sted man er, men ikke vil være. Hva skjer egentlig der?" },
+    { word: "Loftet", hint: "Hva gjemmer seg under støvet? Hvem etterlot det?" },
+    { word: "Strandkanten", hint: "Midt på vinteren. Hva bragte deg hit?" },
+    { word: "Klasserommet", hint: "Pulten bakerst. Hva tenkte du på i stedet for å høre?" },
+    { word: "Hjembyen", hint: "Du ser den fra bilen. Hva kjenner du, og hva ønsker du ikke å kjenne?" },
+    { word: "Grensen", hint: "Mellom to land, to liv, to versjoner av deg selv." },
+    { word: "Hotellet", hint: "Et rom som ikke tilhører noen. Hvem sov her i natt?" },
+    { word: "Taket", hint: "Du ser ned over byen. Hva er det du faktisk tenker på?" },
+    { word: "Kirken", hint: "Selv om du ikke tror. Hva er du likevel ute etter?" },
+    { word: "Bilen", hint: "Alene i trafikken. Hva spiller du, og hva tenker du på?" },
+  ],
+  relasjoner: [
+    { word: "Den som gikk", hint: "Hva var det siste du sa, og mente du det?" },
+    { word: "Moren din", hint: "Noe hun aldri sa direkte. Noe du aldri ba om forklaring på." },
+    { word: "Fremmedgjøring", hint: "Du kjenner ikke igjen personen du pleide å kjenne. Hva skjedde?" },
+    { word: "Vennskapet", hint: "En vennskapets rispe – det lille som forandret alt." },
+    { word: "Barnet", hint: "Hva vil du lære det? Hva er du redd det allerede vet?" },
+    { word: "Den uoppnåelige", hint: "Hva er det egentlig du ser i dem – eller i deg selv?" },
+    { word: "Naboen", hint: "En du ser hver dag uten å egentlig se. Hvem er de?" },
+    { word: "Tilgivelse", hint: "Hva trenger du å gi slipp på? Hva krever det av deg?" },
+    { word: "Farfar", hint: "Noe du aldri rakk å spørre om. Noe han aldri rakk å fortelle." },
+    { word: "Forræderiet", hint: "Hvem, og hva holdt du igjen da du fikk vite det?" },
+    { word: "Den nye", hint: "Hvem er personen i speilet nå? Hva er annerledes?" },
+    { word: "Ekspartneren", hint: "Ikke om ham/henne – om hvem du var da dere var sammen." },
+    { word: "Lederen", hint: "Makt og tillit. Hva går godt, og hva er usynlig?" },
+  ],
+  sanser: [
+    { word: "Lukten av regn", hint: "Petrichor. Hva husker du første gang du kjente den? Hvor var du?" },
+    { word: "Kald metall", hint: "Hva holder du i? Hva holder det deg tilbake fra?" },
+    { word: "Stillheten", hint: "Etter at støyen stoppet. Beskriv de første sekundene." },
+    { word: "Røyk", hint: "Fra en peis, en sigarett, en brann. Hvem er der med deg?" },
+    { word: "Søtt og bittert", hint: "Kaffe med sukker. Et minne som har begge deler." },
+    { word: "Varme hender", hint: "Noen tok tak i hånden din. Hva skjedde rett etter?" },
+    { word: "Støy", hint: "Lyd som ikke slipper deg. Hva ber det deg glemme?" },
+    { word: "Mørket", hint: "Ikke natten – mørket innendørs. Hva ser du likevel?" },
+    { word: "Salt", hint: "Hav, sveitte, tårer. Hva forener disse tre?" },
+    { word: "Vibrasjoner", hint: "Musikk som sitter i brystet. Hva spilte det? Hva var det i deg?" },
+    { word: "Skarp luft", hint: "Minus ti grader og skarpt lys. Hva holder deg gående?" },
+    { word: "Tyngde", hint: "En kropp som er tung å bære. Hva har du båret lenge?" },
+    { word: "Fjær", hint: "Det letteste du kjenner. Hva frigjorde deg til dette?" },
+  ],
+  samfunn: [
+    { word: "Utenforskap", hint: "Systemet som ikke ble laget for deg. Hvem kjenner du?" },
+    { word: "Klimaet", hint: "Ikke politikken – det du faktisk kjenner i kroppen på en varm januardag." },
+    { word: "Skjermen", hint: "Hva mister vi mens vi ser på den? Hva finner vi?" },
+    { word: "Grenser", hint: "Mellom land, mellom folk, mellom det vi sier og det vi mener." },
+    { word: "Overflod", hint: "Vi har mer enn noen gang. Hva mangler likevel?" },
+    { word: "Minnene vi mister", hint: "Hva glemmer generasjonen etter deg? Hva bør de vite?" },
+    { word: "Friheten", hint: "Er den ekte? Hvem definerer den for deg?" },
+    { word: "Tillit", hint: "Til systemet, til hverandre, til fremtiden. Hva er igjen?" },
+    { word: "Rettferdighet", hint: "Et konkret øyeblikk der det ikke var rettferdig. Hva skjedde etterpå?" },
+    { word: "Krigen", hint: "Ikke her, men nær nok til at vi ser den. Hva gjør vi med det?" },
+    { word: "Generasjonsgjeld", hint: "Hva arver du som du ikke ba om? Hva etterlater du?" },
+    { word: "Stillheten i politikken", hint: "Det ingen av partiene snakker om. Det du egentlig lurer på." },
+    { word: "Identitet", hint: "Hva forventes av deg, og hvem er du egentlig under det?" },
+    { word: "Håpet på tross", hint: "Når alt taler mot det – hva velger du å tro på?" },
+  ]
+};
+
+let selectedCategory = null;
+let selectedTime = 6;
+let currentWord = null;
+let timerInterval = null;
+let timeLeft = 0;
+let totalTime = 0;
+let isPaused = false;
+let timerRunning = false;
+
+function selectCategory(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedCategory = cat;
+  document.getElementById('drawBtn').disabled = false;
+
+  // Reset word stage to show placeholder
+  const ws = document.getElementById('wordStage');
+  ws.classList.remove('revealed');
+  document.getElementById('bigWord').textContent = '';
+  document.getElementById('wordCatTag').textContent = '';
+  document.getElementById('wordHint').textContent = '';
+  ws.querySelector('.placeholder-text') && (ws.querySelector('.placeholder-text').style.display = 'none');
+
+  stopTimer();
+}
+
+function selectTime(btn, minutes) {
+  document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedTime = minutes;
+  if (!timerRunning) updateTimerDisplay(minutes * 60, minutes * 60);
+}
+
+function drawWord() {
+  if (!selectedCategory) return;
+
+  const pool = words[selectedCategory];
+  let entry;
+  do { entry = pool[Math.floor(Math.random() * pool.length)]; }
+  while (pool.length > 1 && entry === currentWord);
+  currentWord = entry;
+
+  const catLabels = {
+    følelser: 'Følelser',
+    steder: 'Steder',
+    relasjoner: 'Personer & relasjoner',
+    sanser: 'Sanseinntrykk',
+    samfunn: 'Samfunnsspørsmål'
+  };
+
+  const ws = document.getElementById('wordStage');
+  const ph = ws.querySelector('.placeholder-text');
+  if (ph) ph.style.display = 'none';
+
+  ws.classList.remove('revealed');
+
+  setTimeout(() => {
+    document.getElementById('wordCatTag').textContent = '— ' + catLabels[selectedCategory] + ' —';
+    document.getElementById('bigWord').textContent = entry.word;
+    document.getElementById('wordHint').textContent = entry.hint;
+    ws.classList.add('revealed');
+  }, 80);
+
+  // Hide done message, start timer
+  document.getElementById('doneMessage').classList.remove('visible');
+  stopTimer();
+  startTimer();
+}
+
+function startTimer() {
+  totalTime = selectedTime * 60;
+  timeLeft = totalTime;
+  isPaused = false;
+  timerRunning = true;
+
+  document.getElementById('timerStage').classList.add('visible');
+  document.getElementById('timerStatus').textContent = 'SKRIV';
+  document.getElementById('pauseBtn').textContent = 'Pause';
+
+  updateTimerDisplay(timeLeft, totalTime);
+
+  timerInterval = setInterval(() => {
+    if (!isPaused) {
+      timeLeft--;
+      updateTimerDisplay(timeLeft, totalTime);
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('timerStatus').textContent = 'FERDIG';
+        document.getElementById('timerProgress').style.stroke = var_green();
+        document.getElementById('doneMessage').classList.add('visible');
+        playDoneSound();
+      }
+    }
+  }, 1000);
+}
+
+function var_green() { return '#5ca361'; }
+
+function playDoneSound() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const notes = [523.25, 659.25, 783.99];
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18);
+    gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.18);
+    gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + i * 0.18 + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.8);
+    osc.start(ctx.currentTime + i * 0.18);
+    osc.stop(ctx.currentTime + i * 0.18 + 0.8);
+  });
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  isPaused = false;
+  document.getElementById('timerStage').classList.remove('visible');
+  document.getElementById('doneMessage').classList.remove('visible');
+  document.getElementById('timerProgress').style.stroke = '';
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+  document.getElementById('pauseBtn').textContent = isPaused ? 'Fortsett' : 'Pause';
+  document.getElementById('timerStatus').textContent = isPaused ? 'PAUSE' : 'SKRIV';
+}
+
+function updateTimerDisplay(left, total) {
+  const m = Math.floor(left / 60);
+  const s = left % 60;
+  document.getElementById('timerDigits').textContent =
+    m + ':' + String(s).padStart(2, '0');
+
+  const circumference = 339.3;
+  const fraction = total > 0 ? left / total : 1;
+  const offset = circumference * (1 - fraction);
+  document.getElementById('timerProgress').style.strokeDashoffset = offset;
+
+  // Color shift when low
+  if (left <= 30 && left > 0) {
+    document.getElementById('timerProgress').style.stroke = '#e67e22';
+  } else if (left > 30) {
+    document.getElementById('timerProgress').style.stroke = '';
+  }
+}
+
+// Init timer display
+updateTimerDisplay(selectedTime * 60, selectedTime * 60);
+</script>
+</body>
+</html>
