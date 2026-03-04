@@ -376,7 +376,74 @@
     line-height: 1.7;
   }
 
-  /* Divider */
+  /* Writing area */
+  .write-area {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .write-area.visible { display: flex; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .write-field {
+    width: 100%;
+    min-height: 200px;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 2px;
+    color: var(--cream);
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    padding: 20px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    caret-color: var(--gold);
+  }
+
+  .write-field:focus { border-color: var(--gold-dim); }
+  .write-field::placeholder { color: #333; font-style: italic; }
+
+  .copy-btn {
+    align-self: flex-end;
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .copy-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+    z-index: 0;
+  }
+
+  .copy-btn:hover::before { transform: scaleX(1); }
+  .copy-btn:hover { color: #000; }
+  .copy-btn span { position: relative; z-index: 1; }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+  .copy-btn.copied::before { display: none; }
   .divider {
     border: none;
     border-top: 1px solid #222;
@@ -456,6 +523,14 @@
       <button class="tc-btn" id="pauseBtn" onclick="togglePause()">Pause</button>
       <button class="tc-btn stop" onclick="stopTimer()">Avslutt</button>
     </div>
+  </div>
+
+  <!-- Writing area -->
+  <div class="write-area" id="writeArea">
+    <textarea class="write-field" id="writeField" placeholder="Begynn å skrive her…" spellcheck="false"></textarea>
+    <button class="copy-btn" id="copyBtn" onclick="copyText()">
+      <span id="copyBtnLabel">↗ Kopier teksten</span>
+    </button>
   </div>
 
   <!-- Done message -->
@@ -612,9 +687,15 @@ function drawWord() {
     ws.classList.add('revealed');
   }, 80);
 
-  // Hide done message, start timer
+  // Hide done message, reset timer first
   document.getElementById('doneMessage').classList.remove('visible');
   stopTimer();
+
+  // Show write area
+  document.getElementById('writeArea').classList.add('visible');
+  document.getElementById('writeField').value = '';
+  document.getElementById('writeField').focus();
+
   startTimer();
 }
 
@@ -646,6 +727,21 @@ function startTimer() {
   }, 1000);
 }
 
+function copyText() {
+  const text = document.getElementById('writeField').value;
+  if (!text.trim()) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const label = document.getElementById('copyBtnLabel');
+    btn.classList.add('copied');
+    label.textContent = '✓ Kopiert!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      label.textContent = '↗ Kopier teksten';
+    }, 2500);
+  });
+}
+
 function var_green() { return '#5ca361'; }
 
 function playDoneSound() {
@@ -672,6 +768,7 @@ function stopTimer() {
   isPaused = false;
   document.getElementById('timerStage').classList.remove('visible');
   document.getElementById('doneMessage').classList.remove('visible');
+  document.getElementById('writeArea').classList.remove('visible');
   document.getElementById('timerProgress').style.stroke = '';
 }
 
